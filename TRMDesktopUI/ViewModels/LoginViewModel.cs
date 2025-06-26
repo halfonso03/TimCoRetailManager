@@ -5,21 +5,25 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using TRMDesktopUI.Helpers;
+using TRMDesktopUI.Library.Helpers;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
-    public class LoginViewModel : Screen
-    {
+	public class LoginViewModel : Screen
+	{
 		private IApiHelper _apiHelper;
-		private string _userName;
+		private string _UserName = "hector.alfonso@yahoo.com";
+		private string _Password = "Password#1";
 
 		public string UserName
 		{
-			get { return _userName; }
+			get { return _UserName; }
 			set
 			{
-				_userName = value;
+				_UserName = value;
 
 				NotifyOfPropertyChange(() => UserName);	
 				NotifyOfPropertyChange(() => CanLogin);	
@@ -36,15 +40,15 @@ namespace TRMDesktopUI.ViewModels
 			{
 				_password = value;
 
-                NotifyOfPropertyChange(() => Password);
-                NotifyOfPropertyChange(() => CanLogin);
+				NotifyOfPropertyChange(() => Password);
+				NotifyOfPropertyChange(() => CanLogin);
 
-            }
-        }
+			}
+		}
 
 		public bool IsErrorVisible => !string.IsNullOrEmpty(ErrorMessage);
 
-        private string _errorMessage;
+		private string _errorMessage;
 
 		public string ErrorMessage
 		{
@@ -52,32 +56,34 @@ namespace TRMDesktopUI.ViewModels
 			set
 			{
 				_errorMessage = value;
-                NotifyOfPropertyChange(() => IsErrorVisible);
-                NotifyOfPropertyChange(() =>  ErrorMessage);
+				NotifyOfPropertyChange(() => IsErrorVisible);
+				NotifyOfPropertyChange(() =>  ErrorMessage);
 			}
 		}
 
 
 
 
-		public LoginViewModel(ApiHelper apiHelper)
+		public LoginViewModel()
 		{
-			_apiHelper = apiHelper;
-		}
+			//_apiHelper = apiHelper;
+			_apiHelper = ApiHelper.Instance;
 
-        public bool CanLogin
-		{
-            get
-            {
-                bool output = false;
-                if (UserName?.Length > 0 && Password?.Length > 0)
-                {
-                    output = true;
-                }
-
-                return output;
-            }
         }
+
+		public bool CanLogin
+		{
+			get
+			{
+				bool output = false;
+				if (UserName?.Length > 0 && Password?.Length > 0)
+				{
+					output = true;
+				}
+
+				return output;
+			}
+		}
 
 		public async void Login()
 		{
@@ -87,7 +93,12 @@ namespace TRMDesktopUI.ViewModels
 			{
 				ErrorMessage = string.Empty;
 
-				var user = await new ApiHelper().Authenticate(UserName, Password);
+				var apiHelper = new ApiHelper();
+
+                AuthenticatedUser user = await apiHelper.Authenticate(UserName, Password);
+
+				await _apiHelper.GetLoginUserInfo(user.Access_Token);
+
 
 			}
 			catch (Exception ex)
