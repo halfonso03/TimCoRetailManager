@@ -42,6 +42,23 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+		public bool IsErrorVisible => !string.IsNullOrEmpty(ErrorMessage);
+
+        private string _errorMessage;
+
+		public string ErrorMessage
+		{
+			get { return _errorMessage; }
+			set
+			{
+				_errorMessage = value;
+                NotifyOfPropertyChange(() => IsErrorVisible);
+                NotifyOfPropertyChange(() =>  ErrorMessage);
+			}
+		}
+
+
+
 
 		public LoginViewModel(ApiHelper apiHelper)
 		{
@@ -68,12 +85,14 @@ namespace TRMDesktopUI.ViewModels
 
 			try
 			{
+				ErrorMessage = string.Empty;
+
 				var user = await new ApiHelper().Authenticate(UserName, Password);
 
 			}
 			catch (Exception ex)
 			{
-				Debug.Write(ex.Message);	
+				ErrorMessage = ex.Message;	
 			}		
 		}
 

@@ -3,13 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TRMDesktopUI">
     <Application.Resources>
-        <ResourceDictionary>
+        <ResourceDictionary>            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <local:Bootstrapper x:Key="Bootstrapper"/>
+                    <local:Bootstrapper x:Key="Bootstrapper"/>                   
                 </ResourceDictionary>
+                <ResourceDictionary Source="/Styles/Fonts.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         </ResourceDictionary>
-         
+        
     </Application.Resources>
 </Application>
