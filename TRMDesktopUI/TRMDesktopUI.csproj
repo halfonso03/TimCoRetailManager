@@ -144,6 +144,10 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TRMDataManager.Library\TRMDataManager.Library.csproj">
+      <Project>{4D27D646-3991-4753-854C-C7172D8599C3}</Project>
+      <Name>TRMDataManager.Library</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TRMDesktopUI.Library\TRMDesktopUI.Library.csproj">
       <Project>{bf23d613-d001-47dc-b270-eb41686ae0e9}</Project>
       <Name>TRMDesktopUI.Library</Name>

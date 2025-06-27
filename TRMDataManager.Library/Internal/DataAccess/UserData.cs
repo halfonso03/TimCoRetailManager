@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TRMDataManager.Library.Internal.DataAccess;
-using TRMDataManager.Library.Internal.DataAccess.TRMDataManager.Library.Internal.DataAccess;
 using TRMDataManager.Library.Internal.Models;
 
-namespace TRMDataManager.Library.DataAccess
+namespace TRMDataManager.Library.Internal.DataAccess
 {
     public class UserData
     {
@@ -15,7 +14,7 @@ namespace TRMDataManager.Library.DataAccess
         {
             SqlDataAccess sql = new SqlDataAccess();
 
-            var p = new { Id = Id };
+            var p = new { Id };
 
             var output = sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "TRMData");
 

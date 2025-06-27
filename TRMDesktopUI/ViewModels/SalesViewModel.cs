@@ -3,16 +3,35 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using TRMDataManager.Library.Models;
+using TRMDesktopUI.Library.Api;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<string> _products;
+        private readonly IProductEndpoint _productEndpoint;
 
-        public BindingList<string> Products
+
+        protected override async void OnViewLoaded(object view)
+        {
+
+            base.OnViewLoaded(view);
+            var p = await _productEndpoint.GetAll();
+            Products = new BindingList<ProductModel>(p);
+        }
+
+        public SalesViewModel(IProductEndpoint productEndpoint)
+        {
+            _productEndpoint = productEndpoint;
+        }
+
+        private BindingList<ProductModel> _products;
+
+        public BindingList<ProductModel> Products
         {
             get { return _products; }
             set
@@ -35,6 +54,7 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private int _itemQuantity;
+        
 
         public int ItemQuantity
         {
