@@ -69,7 +69,7 @@ namespace TRMDesktopUI.ViewModels
 			//_apiHelper = apiHelper;
 			_apiHelper = ApiHelper.Instance;
 
-        }
+		}
 
 		public bool CanLogin
 		{
@@ -95,7 +95,7 @@ namespace TRMDesktopUI.ViewModels
 
 				var apiHelper = new ApiHelper();
 
-                AuthenticatedUser user = await apiHelper.Authenticate(UserName, Password);
+				AuthenticatedUser user = await apiHelper.Authenticate(UserName, Password);
 
 				await _apiHelper.GetLoginUserInfo(user.Access_Token);
 
