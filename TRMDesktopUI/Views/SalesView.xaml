@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Background="White"
              FontSize="24"
-             d:DesignHeight="600" d:DesignWidth="1000">
+             d:DesignHeight="800" d:DesignWidth="1000">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -39,6 +39,7 @@
                  MinHeight="200"
                  MinWidth="150"
                  ItemsSource="{Binding Products}"
+                 SelectedItem="{Binding SelectedProduct}"
                  >
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -64,7 +65,14 @@
                  Grid.Row="1"
                  Grid.Column="2"
                  MinHeight="200"
-                 MinWidth="150"></ListBox>
+                 MinWidth="150"
+                 ItemsSource="{Binding Cart}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayText}"></TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <DockPanel Grid.Row="3" Grid.Column="2" >
             <TextBlock Text="Sub Total:" Margin="0 0 15 0"></TextBlock>
             <TextBlock x:Name="SubTotal" Text="$0.00" Grid.Row="2" Grid.Column="2" TextAlignment="Right"></TextBlock>

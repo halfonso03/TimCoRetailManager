@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TRMDataManager.Library.Models;
 using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Helpers;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -18,10 +21,14 @@ namespace TRMDesktopUI.ViewModels
 
         protected override async void OnViewLoaded(object view)
         {
-
             base.OnViewLoaded(view);
             var p = await _productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(p);
+            //Products = new BindingList<ProductModel>(p);
+
+            p.ForEach(x =>
+            {
+                Products.Add(x);
+            });
         }
 
         public SalesViewModel(IProductEndpoint productEndpoint)
@@ -29,21 +36,35 @@ namespace TRMDesktopUI.ViewModels
             _productEndpoint = productEndpoint;
         }
 
-        private BindingList<ProductModel> _products;
+        private ObservableCollection<ProductModel> _products = new ObservableCollection<ProductModel>();
 
-        public BindingList<ProductModel> Products
+        public ObservableCollection<ProductModel> Products
         {
             get { return _products; }
             set
             {
                 _products = value;
-                NotifyOfPropertyChange(() => Products);
+                //NotifyOfPropertyChange(() => Products);
             }
         }
 
-        private BindingList<string> _cart;
+        private ProductModel _selectedProduct;
 
-        public BindingList<string> Cart
+        public ProductModel SelectedProduct
+        {
+            get { return _selectedProduct; }
+            set
+            {
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
+            }
+        }
+
+
+        private ObservableCollection<CartItemModel> _cart = new ObservableCollection<CartItemModel>();
+
+        public ObservableCollection<CartItemModel> Cart
         {
             get { return _cart; }
             set
@@ -53,7 +74,7 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private int _itemQuantity;
+        private int _itemQuantity = 0;
         
 
         public int ItemQuantity
@@ -63,6 +84,7 @@ namespace TRMDesktopUI.ViewModels
             {
                 _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
@@ -70,7 +92,15 @@ namespace TRMDesktopUI.ViewModels
         {
             get
             {
-                return "$0.00";
+
+                decimal subTotal = 0;
+
+                foreach(var c in Cart)
+                {
+                    subTotal += c.QuantityInCart * c.Product.RetailPrice;
+                }
+
+                return $"{subTotal:C2}";
             }
         }
 
@@ -93,6 +123,31 @@ namespace TRMDesktopUI.ViewModels
         public void AddToCart()
         {
 
+            if (Cart.Any(c => c.Product.Id == SelectedProduct.Id))
+            {
+                var cartItem = Cart.Where(c => c.Product.Id == SelectedProduct.Id).First();
+
+                Cart.Replace2(cartItem, new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity + cartItem.QuantityInCart,
+                });
+            }
+            else
+            {
+                var cartItem = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity,
+                };
+
+                Cart.Add(cartItem);
+            }
+                
+            SelectedProduct.QuantityInStock -= ItemQuantity;
+            ItemQuantity = 1;
+
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public bool CanAddToCart
@@ -101,8 +156,10 @@ namespace TRMDesktopUI.ViewModels
             {
                 bool output = false;
 
-
-
+                if (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity)
+                {
+                    output = true;
+                }
 
                 return output;
             }
@@ -110,7 +167,7 @@ namespace TRMDesktopUI.ViewModels
 
         public void RemoveToCart()
         {
-
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public bool CanRemoveToCart

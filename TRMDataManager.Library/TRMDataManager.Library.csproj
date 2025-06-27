@@ -48,8 +48,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\IProductEndpoint.cs" />
-    <Compile Include="Api\ProductEndpoint.cs" />
     <Compile Include="Internal\DataAccess\IProductData.cs" />
     <Compile Include="Internal\DataAccess\ProductData.cs" />
     <Compile Include="Internal\DataAccess\UserData.cs" />
@@ -62,10 +60,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TRMDesktopUI.Library\TRMDesktopUI.Library.csproj">
-      <Project>{BF23D613-D001-47DC-B270-EB41686AE0E9}</Project>
-      <Name>TRMDesktopUI.Library</Name>
-    </ProjectReference>
+    <Folder Include="Api\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TRMDataManager.Library.Models;
 using TRMDesktopUI.Library.Helpers;
-using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.Library.Api
 {
