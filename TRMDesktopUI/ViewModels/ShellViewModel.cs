@@ -3,20 +3,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using TRMDesktopUI.EventModels;
 
 namespace TRMDesktopUI.ViewModels
 {
-    public class ShellViewModel : Conductor<object>
+    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
     {
-        private LoginViewModel _loginVM;
+        private readonly SalesViewModel _saleVM;
+        private readonly IEventAggregator _events;
 
-        public ShellViewModel(LoginViewModel loginVM)
+        private SimpleContainer _container { get; }
+
+        public ShellViewModel(SalesViewModel saleVM, IEventAggregator events,
+            SimpleContainer container)
         {
-            _loginVM = loginVM;
+            _saleVM = saleVM;
+            
+            _events = events;
+            _container = container;
 
-            ActivateItemAsync(_loginVM);
+            _events.SubscribeOnPublishedThread(this);
+            
+            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+        }
+
+        public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
+        {
+
+            await ActivateItemAsync(_saleVM);
 
         }
+
+    
     }
 }

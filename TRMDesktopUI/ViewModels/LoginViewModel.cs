@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using TRMDesktopUI.EventModels;
 using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
@@ -15,6 +16,7 @@ namespace TRMDesktopUI.ViewModels
 	public class LoginViewModel : Screen
 	{
 		private IApiHelper _apiHelper;
+		private readonly IEventAggregator _events;
 		private string _UserName = "hector.alfonso@yahoo.com";
 		private string _Password = "Password#1";
 
@@ -61,14 +63,10 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-
-
-
-		public LoginViewModel()
+		public LoginViewModel(IApiHelper apiHelper, IEventAggregator events)
 		{
-			//_apiHelper = apiHelper;
-			_apiHelper = ApiHelper.Instance;
-
+			_apiHelper = apiHelper;
+			_events = events;
 		}
 
 		public bool CanLogin
@@ -98,6 +96,8 @@ namespace TRMDesktopUI.ViewModels
 				AuthenticatedUser user = await apiHelper.Authenticate(UserName, Password);
 
 				await _apiHelper.GetLoginUserInfo(user.Access_Token);
+
+				await _events.PublishOnUIThreadAsync(new LogOnEvent());
 
 
 			}

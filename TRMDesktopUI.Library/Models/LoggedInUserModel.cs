@@ -8,7 +8,7 @@ namespace TRMDesktopUI.Library.Models
 {
     public class LoggedInUserModel : ILoggedInUserModel
     {
-        public static ILoggedInUserModel Instance = new LoggedInUserModel();
+        //public static ILoggedInUserModel Instance = new LoggedInUserModel();
         public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

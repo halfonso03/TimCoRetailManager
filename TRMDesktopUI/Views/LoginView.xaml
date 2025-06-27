@@ -71,6 +71,6 @@
         
         <!--login row-->
         <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="Login" x:Name="Login" 
-                Padding="20 5" HorizontalAlignment="Center"></Button>
+                Padding="20 5" HorizontalAlignment="Center" IsDefault="True"></Button>
     </Grid> 
 </UserControl>

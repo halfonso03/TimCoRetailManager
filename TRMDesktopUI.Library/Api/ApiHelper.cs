@@ -18,9 +18,8 @@ namespace TRMDesktopUI.Library.Helpers
     public class ApiHelper : IApiHelper
     {
         public HttpClient apiClient { get; set; }
-        private ILoggedInUserModel _loggedInUser = LoggedInUserModel.Instance;
-        public static IApiHelper Instance = new ApiHelper();
-        
+        private ILoggedInUserModel _loggedInUser;
+
 
         public HttpClient ApiClient
         {
@@ -36,11 +35,11 @@ namespace TRMDesktopUI.Library.Helpers
             InitializeClient();
         }
 
-        //public ApiHelper(ILoggedInUserModel loggedInUser)
-        //{
-        //    InitializeClient();
-
-        //}
+        public ApiHelper(ILoggedInUserModel loggedInUser)
+        {
+            _loggedInUser = loggedInUser;
+            InitializeClient();
+        }
 
         private void InitializeClient()
         {
