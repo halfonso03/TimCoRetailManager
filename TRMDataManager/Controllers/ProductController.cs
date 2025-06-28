@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using TRMDataManager.Library.Internal.DataAccess;
-using TRMDataManager.Library.Models;
+using TRMDataManager.Library.Internal.Models;
 
 namespace TRMDataManager.Controllers
 {

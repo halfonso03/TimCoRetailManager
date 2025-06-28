@@ -1,13 +1,6 @@
 ﻿using Caliburn.Micro;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using TRMDataManager.Library.Models;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
@@ -18,6 +11,7 @@ namespace TRMDesktopUI.ViewModels
     {
         private readonly IProductEndpoint _productEndpoint;
         private readonly IConfigHelper _configHelper;
+        private readonly ISaleEndpoint _saleEndpoint;
 
         protected override async void OnViewLoaded(object view)
         {
@@ -31,10 +25,11 @@ namespace TRMDesktopUI.ViewModels
             });
         }
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
         {
             _productEndpoint = productEndpoint;
             _configHelper = configHelper;
+            _saleEndpoint = saleEndpoint;
         }
 
         private ObservableCollection<ProductModel> _products = new ObservableCollection<ProductModel>();
@@ -62,7 +57,6 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-
         private ObservableCollection<CartItemModel> _cart = new ObservableCollection<CartItemModel>();
 
         public ObservableCollection<CartItemModel> Cart
@@ -76,8 +70,6 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private int _itemQuantity = 0;
-        
-
         public int ItemQuantity
         {
             get { return _itemQuantity; }
@@ -164,6 +156,8 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckout);
+
         }
 
         public bool CanAddToCart
@@ -186,7 +180,7 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
-
+            NotifyOfPropertyChange(() => CanCheckout);
         }
 
         public bool CanRemoveToCart
@@ -202,21 +196,30 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        public void Checkout()
+        public async void Checkout()
         {
+            var sale = new SaleModel();
 
+            Cart.ToList().ForEach(cart =>
+            {
+                sale.SaleDetails.Add(
+                    new SaleDetailModel()
+                    {
+                        ProductId = cart.Product.Id,
+                        Quantity = cart.QuantityInCart
+                    });
+            });
+
+            await _saleEndpoint.PostSale(sale);
+
+          
         }
 
         public bool CanCheckout
         {
             get
             {
-                bool output = false;
-
-
-
-
-                return output;
+                return Cart.Count > 0;
             }
         }
 

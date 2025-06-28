@@ -38,6 +38,7 @@ namespace TRMDesktopUI
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()
                 .Singleton<IApiHelper, ApiHelper>()
+                .Singleton<ISaleEndpoint, SaleEndpoint>()
                 .Singleton<IConfigHelper, ConfigHelper>();
 
 

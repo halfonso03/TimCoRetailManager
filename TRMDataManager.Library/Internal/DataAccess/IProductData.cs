@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TRMDataManager.Library.Models;
+using TRMDataManager.Library.Internal.Models;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {

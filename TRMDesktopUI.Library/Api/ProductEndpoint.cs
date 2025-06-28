@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using TRMDataManager.Library.Models;
+
 using TRMDesktopUI.Library.Helpers;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.Library.Api
 {

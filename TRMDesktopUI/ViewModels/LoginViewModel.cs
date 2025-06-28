@@ -18,7 +18,6 @@ namespace TRMDesktopUI.ViewModels
 		private IApiHelper _apiHelper;
 		private readonly IEventAggregator _events;
 		private string _UserName = "hector.alfonso@yahoo.com";
-		private string _Password = "Password#1";
 
 		public string UserName
 		{
@@ -33,7 +32,7 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-		private string _password;
+		private string _password = "Password#1";
 
 		public string Password
 		{
