@@ -93,6 +93,19 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+        private CartItemDisplayModel _selectedCartItem; 
+
+        public CartItemDisplayModel SelectedCartItem
+        {
+            get { return _selectedCartItem; }
+            set
+            {
+                _selectedCartItem = value;
+                NotifyOfPropertyChange(() => SelectedCartItem);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+            }
+        }
+
         public string SubTotal
         {
             get
@@ -187,22 +200,35 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        public void RemoveToCart()
+        public void RemoveFromCart()
         {
+            SelectedCartItem.Product.QuantityInStock += 1;
+
+            if (SelectedCartItem.QuantityInCart > 1)
+            {
+                SelectedCartItem.QuantityInCart -= 1;
+            }
+            else
+            {
+                Cart.Remove(SelectedCartItem);
+            }
+
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckout);
         }
-
-        public bool CanRemoveToCart
+        
+        public bool CanRemoveFromCart
         {
             get
             {
                 bool output = false;
 
-
-
+                if (SelectedCartItem != null && SelectedCartItem.QuantityInCart > 0)
+                {
+                    output = true;
+                }
 
                 return output;
             }
