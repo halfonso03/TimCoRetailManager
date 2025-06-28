@@ -80,7 +80,7 @@
 
         <DockPanel Grid.Row="4" Grid.Column="2" >
             <TextBlock Text="Tax:"></TextBlock>
-            <TextBlock x:Name="Text" Text="$0.00" Grid.Row="2" Grid.Column="2" TextAlignment="Right"></TextBlock>
+            <TextBlock x:Name="Tax" Text="$0.00" Grid.Row="2" Grid.Column="2" TextAlignment="Right"></TextBlock>
         </DockPanel>
 
         <DockPanel Grid.Row="5" Grid.Column="2" >

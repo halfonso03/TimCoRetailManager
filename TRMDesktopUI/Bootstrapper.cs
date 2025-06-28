@@ -37,7 +37,8 @@ namespace TRMDesktopUI
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()
-                .Singleton<IApiHelper, ApiHelper>();
+                .Singleton<IApiHelper, ApiHelper>()
+                .Singleton<IConfigHelper, ConfigHelper>();
 
 
             GetType().Assembly.GetTypes()

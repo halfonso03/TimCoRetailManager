@@ -17,7 +17,7 @@ namespace TRMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
         private readonly IProductEndpoint _productEndpoint;
-
+        private readonly IConfigHelper _configHelper;
 
         protected override async void OnViewLoaded(object view)
         {
@@ -31,9 +31,10 @@ namespace TRMDesktopUI.ViewModels
             });
         }
 
-        public SalesViewModel(IProductEndpoint productEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
         }
 
         private ObservableCollection<ProductModel> _products = new ObservableCollection<ProductModel>();
@@ -92,31 +93,52 @@ namespace TRMDesktopUI.ViewModels
         {
             get
             {
-
-                decimal subTotal = 0;
-
-                foreach(var c in Cart)
-                {
-                    subTotal += c.QuantityInCart * c.Product.RetailPrice;
-                }
-
-                return $"{subTotal:C2}";
+                return CalculateSubTotal().ToString("C");
             }
+        }
+
+        private decimal CalculateTax()
+        {
+            decimal taxAmount = 0;
+            decimal taxRate = _configHelper.GetTaxRate() / 100;
+
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate);
+                }
+            }
+
+            return taxAmount;
         }
 
         public string Tax
         {
             get
             {
-                return "$0.00";
+                return CalculateTax().ToString("C");
             }
+        }
+
+        private decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+
+            foreach (var item in Cart)
+            {
+                subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+            }
+
+            return subTotal;
         }
 
         public string Total
         {
             get
             {
-                return "$0.00";
+                decimal total = CalculateSubTotal() + CalculateTax();
+                return $"{total:C2}";
             }
         }
 
@@ -134,20 +156,20 @@ namespace TRMDesktopUI.ViewModels
                 });
             }
             else
-            {
-                var cartItem = new CartItemModel
+            {            
+                Cart.Add(new CartItemModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity,
-                };
-
-                Cart.Add(cartItem);
+                });
             }
                 
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
 
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanAddToCart
@@ -168,6 +190,9 @@ namespace TRMDesktopUI.ViewModels
         public void RemoveToCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+
         }
 
         public bool CanRemoveToCart
