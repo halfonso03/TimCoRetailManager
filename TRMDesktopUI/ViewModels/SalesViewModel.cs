@@ -1,9 +1,15 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
+using TRMDesktopUI.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -12,41 +18,47 @@ namespace TRMDesktopUI.ViewModels
         private readonly IProductEndpoint _productEndpoint;
         private readonly IConfigHelper _configHelper;
         private readonly ISaleEndpoint _saleEndpoint;
+        private readonly IMapper _mapper;
 
-        protected override async void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-            var p = await _productEndpoint.GetAll();
-            //Products = new BindingList<ProductModel>(p);
 
-            p.ForEach(x =>
-            {
-                Products.Add(x);
-            });
-        }
-
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper,
+                                ISaleEndpoint saleEndpoint, IMapper mapper)
         {
             _productEndpoint = productEndpoint;
             _configHelper = configHelper;
             _saleEndpoint = saleEndpoint;
+            _mapper = mapper;
         }
 
-        private ObservableCollection<ProductModel> _products = new ObservableCollection<ProductModel>();
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            await LoadProducts();
+        }
 
-        public ObservableCollection<ProductModel> Products
+        private async Task LoadProducts()
+        {
+            var productLists = await _productEndpoint.GetAll();
+            var products = _mapper.Map<List<ProductDisplayModel>>(productLists);
+            Products = new ObservableCollection<ProductDisplayModel>(products);
+        }
+
+
+        private ObservableCollection<ProductDisplayModel> _products;
+
+        public ObservableCollection<ProductDisplayModel> Products
         {
             get { return _products; }
             set
             {
                 _products = value;
-                //NotifyOfPropertyChange(() => Products);
+                NotifyOfPropertyChange(() => Products);
             }
         }
 
-        private ProductModel _selectedProduct;
+        private ProductDisplayModel _selectedProduct;
 
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
             set
@@ -57,9 +69,9 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private ObservableCollection<CartItemModel> _cart = new ObservableCollection<CartItemModel>();
+        private ObservableCollection<CartItemDisplayModel> _cart = new ObservableCollection<CartItemDisplayModel>();
 
-        public ObservableCollection<CartItemModel> Cart
+        public ObservableCollection<CartItemDisplayModel> Cart
         {
             get { return _cart; }
             set
@@ -135,7 +147,7 @@ namespace TRMDesktopUI.ViewModels
             {
                 var cartItem = Cart.Where(c => c.Product.Id == SelectedProduct.Id).First();
 
-                Cart.Replace2(cartItem, new CartItemModel
+                Cart.Replace2(cartItem, new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity + cartItem.QuantityInCart,
@@ -143,7 +155,7 @@ namespace TRMDesktopUI.ViewModels
             }
             else
             {            
-                Cart.Add(new CartItemModel
+                Cart.Add(new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity,
