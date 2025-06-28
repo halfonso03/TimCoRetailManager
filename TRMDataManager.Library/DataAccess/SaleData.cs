@@ -61,7 +61,7 @@ namespace TRMDataManager.Library.DataAccess
             sql.SaveData<SaleDBModel>("dbo.spSale_Insert", sale, "TRMData");
 
             // Get the Id from the sale model
-            sale.Id = sql.LoadData<int, dynamic>("dbo.spSale_Lookup", new { CashierId = sale.CashierId, SaleDate = sale.SaleDate }, "TRMData").FirstOrDefault();
+            sale.Id = sql.LoadData<int, dynamic>("dbo.spSale_Lookup", new { sale.CashierId, sale.SaleDate }, "TRMData").FirstOrDefault();
 
             // Finish filling in the sale details models
             foreach (var item in details)
