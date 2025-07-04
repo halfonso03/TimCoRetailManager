@@ -76,7 +76,7 @@ namespace TRMDesktopUI.ViewModels
             get { return _cart; }
             set
             {
-                 _cart = value;
+                _cart = value;
                 NotifyOfPropertyChange(() => Cart);
             }
         }
@@ -93,7 +93,7 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private CartItemDisplayModel _selectedCartItem; 
+        private CartItemDisplayModel _selectedCartItem;
 
         public CartItemDisplayModel SelectedCartItem
         {
@@ -117,7 +117,7 @@ namespace TRMDesktopUI.ViewModels
         private decimal CalculateTax()
         {
             decimal taxRate = _configHelper.GetTaxRate() / 100;
-            decimal taxAmount  = Cart
+            decimal taxAmount = Cart
                 .Where(x => x.Product.IsTaxable)
                 .Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
 
@@ -167,14 +167,14 @@ namespace TRMDesktopUI.ViewModels
                 });
             }
             else
-            {            
+            {
                 Cart.Add(new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity,
                 });
             }
-                
+            //SelectedCartItem. 
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
 
@@ -182,6 +182,8 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckout);
+            NotifyOfPropertyChange(() => CanRemoveFromCart);
+
 
         }
 
@@ -217,8 +219,9 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckout);
+            NotifyOfPropertyChange(() => CanAddToCart);
         }
-        
+
         public bool CanRemoveFromCart
         {
             get
@@ -250,7 +253,8 @@ namespace TRMDesktopUI.ViewModels
 
             await _saleEndpoint.PostSale(sale);
 
-          
+            await ResetViewModel();
+
         }
 
         public bool CanCheckout
@@ -259,6 +263,18 @@ namespace TRMDesktopUI.ViewModels
             {
                 return Cart.Count > 0;
             }
+        }
+
+        private async Task ResetViewModel()
+        {
+            Cart = new ObservableCollection<CartItemDisplayModel>();
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanAddToCart);
+            NotifyOfPropertyChange(() => CanCheckout);
+
+            await LoadProducts();
         }
 
     }

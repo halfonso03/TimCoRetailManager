@@ -7,7 +7,8 @@
              mc:Ignorable="d" 
              Background="White"
              FontSize="24"
-             d:DesignHeight="800" d:DesignWidth="1000">
+             d:DesignHeight="500" d:DesignWidth="600"
+             Height="500">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -73,6 +74,7 @@
 
         <!--column 2-->
         <TextBlock Text="Cart" Grid.Row="1" Grid.Column="2" ></TextBlock>
+        
         <ListBox x:Name="Cart"
                  Grid.Row="1"
                  Grid.Column="2"
@@ -86,6 +88,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        
         <DockPanel Grid.Row="3" Grid.Column="2" >
             <TextBlock Text="Sub Total:" Margin="0 0 15 0"></TextBlock>
             <TextBlock x:Name="SubTotal" Text="$0.00" Grid.Row="2" Grid.Column="2" TextAlignment="Right"></TextBlock>

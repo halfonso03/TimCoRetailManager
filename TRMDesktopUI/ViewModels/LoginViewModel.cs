@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -62,6 +63,8 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
+		public event System.Action OnLogin;
+
 		public LoginViewModel(IApiHelper apiHelper, IEventAggregator events)
 		{
 			_apiHelper = apiHelper;
@@ -84,8 +87,6 @@ namespace TRMDesktopUI.ViewModels
 
 		public async void Login()
 		{
-
-
 			try
 			{
 				ErrorMessage = string.Empty;
@@ -98,6 +99,7 @@ namespace TRMDesktopUI.ViewModels
 
 				await _events.PublishOnUIThreadAsync(new LogOnEvent());
 
+				OnLogin?.Invoke();
 
 			}
 			catch (Exception ex)

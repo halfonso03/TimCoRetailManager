@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TRMDesktopUI.EventModels;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -13,25 +15,49 @@ namespace TRMDesktopUI.ViewModels
     {
         private readonly SalesViewModel _saleVM;
         private readonly IEventAggregator _events;
+        private readonly ILoggedInUserModel _user;
+        private readonly LoginViewModel _loginViewModel;
+        public bool IsLoggedIn { get; set; }
 
-        public ShellViewModel(SalesViewModel saleVM, IEventAggregator events)
+        public ShellViewModel(SalesViewModel saleVM, IEventAggregator events, ILoggedInUserModel loggedInUser)
         {
             _saleVM = saleVM;
             
             _events = events;
-
-            _events.SubscribeOnPublishedThread(this);
+            _user = loggedInUser;
+            _events.SubscribeOnPublishedThread(this);            
             
-            ActivateItemAsync(IoC.Get<LoginViewModel>());
+            _loginViewModel = IoC.Get<LoginViewModel>();
+
+            ActivateItemAsync(_loginViewModel);
+
+            _loginViewModel.OnLogin += _loginViewModel_OnLogin;
+
+        }
+
+        private void _loginViewModel_OnLogin()
+        {
+            IsLoggedIn = true;
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-
             await ActivateItemAsync(_saleVM);
-
         }
 
-    
+        public async void ExitApplication()
+        {
+            await TryCloseAsync();
+        }
+
+        public void LogOut()
+        {
+            _user.LogOffUser();
+            IsLoggedIn = false;
+            NotifyOfPropertyChange(() => IsLoggedIn);
+            _loginViewModel.OnLogin -= _loginViewModel_OnLogin;
+            ActivateItemAsync(_loginViewModel);
+        }
     }
 }
