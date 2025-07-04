@@ -9,5 +9,7 @@ namespace TRMDesktopUI.Library.Helpers
         HttpClient ApiClient { get; }
         Task<AuthenticatedUser> Authenticate(string username, string password);
         Task GetLoginUserInfo(string token);
+
+        void LogOffUser();
     }
 }

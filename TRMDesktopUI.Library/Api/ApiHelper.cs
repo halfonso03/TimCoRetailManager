@@ -109,5 +109,10 @@ namespace TRMDesktopUI.Library.Helpers
                 }
             }
         }
+
+        public void LogOffUser()
+        {
+            _httpClient.DefaultRequestHeaders.Clear();
+        }
     }
 }

@@ -8,7 +8,6 @@ namespace TRMDesktopUI.Library.Models
 {
     public class LoggedInUserModel : ILoggedInUserModel
     {
-        //public static ILoggedInUserModel Instance = new LoggedInUserModel();
         public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -16,7 +15,7 @@ namespace TRMDesktopUI.Library.Models
         public DateTime CreateDate { get; set; }
         public string Token { get; set; }
 
-        public void LogOffUser()
+        public void ResetUserModel()
         {
             Token = "";
             FirstName = "";
