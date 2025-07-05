@@ -8,9 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-
-
 namespace TRMDataManager.Library.Internal.DataAccess
 {
     internal class SqlDataAccess : IDisposable
@@ -62,6 +59,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
             _transaction = _connection.BeginTransaction();
         }
+
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
             List<T> rows = _connection.Query<T>(storedProcedure, parameters,
@@ -78,6 +76,8 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
         public void CommitTransaction()
         {
+            if (_transaction.Connection is null) return;
+
             _transaction?.Commit();
             _connection?.Close();
         }
@@ -94,4 +94,3 @@ namespace TRMDataManager.Library.Internal.DataAccess
         }
     }
 }
-
