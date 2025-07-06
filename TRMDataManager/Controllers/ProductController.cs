@@ -6,7 +6,7 @@ using TRMDataManager.Library.Internal.Models;
 namespace TRMDataManager.Controllers
 {
     [Route("api/Product")]
-    //[Authorize]
+    [Authorize(Roles = "Cashier")]
     public class ProductController : ApiController
     {
         private readonly ProductData _productData = new ProductData();
