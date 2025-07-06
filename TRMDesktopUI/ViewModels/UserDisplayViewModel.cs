@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace TRMDesktopUI.ViewModels
         private readonly IWindowManager _window;
         private readonly IUserEndpoint _userEndpoint;
 
-        BindingList<UserModel> _users;
-        public BindingList<UserModel> Users
+        ObservableCollection<UserModel> _users;
+        public ObservableCollection<UserModel> Users
         {
             get
             {
@@ -44,7 +45,7 @@ namespace TRMDesktopUI.ViewModels
                 SelectedUserName = value.Email;
 
                 UserRoles.Clear();
-                UserRoles = new BindingList<string>(value.Roles.Select(x => x.Value).ToList());
+                UserRoles = new ObservableCollection<string>(value.Roles.Select(x => x.Value).ToList());
                 _ = LoadRoles();
 
                 NotifyOfPropertyChange(() => SelectedUser);
@@ -87,9 +88,9 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private BindingList<string> _userRoles = new BindingList<string>();
+        private ObservableCollection<string> _userRoles = new ObservableCollection<string>();
 
-        public BindingList<string> UserRoles
+        public ObservableCollection<string> UserRoles
         {
             get { return _userRoles; }
             set
@@ -99,9 +100,9 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private BindingList<string> _availableRoles = new BindingList<string>();
+        private ObservableCollection<string> _availableRoles = new ObservableCollection<string>();
 
-        public BindingList<string> AvailableRoles
+        public ObservableCollection<string> AvailableRoles
         {
             get { return _availableRoles; }
             set
@@ -153,7 +154,7 @@ namespace TRMDesktopUI.ViewModels
         private async Task LoadUsers()
         {
             var userLists = await _userEndpoint.GetAll();
-            Users = new BindingList<UserModel>(userLists);
+            Users = new ObservableCollection<UserModel>(userLists);
         }
 
         private async Task LoadRoles()
@@ -167,6 +168,8 @@ namespace TRMDesktopUI.ViewModels
                     AvailableRoles.Add(role.Value);
                 }
             }
+
+
         }
 
         public async Task AddSelectedRole()

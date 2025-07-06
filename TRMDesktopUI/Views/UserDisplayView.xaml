@@ -62,23 +62,65 @@
                     Grid.Column="1"
                     Grid.RowSpan="2"
                     Margin="20 0 0 0">
-            <TextBlock x:Name="SelectedUserName"
-                       Margin="0 0 0 10" />
-            <TextBlock Text="Current Roles" />
-            <StackPanel Orientation="Horizontal"
-                        Margin="0 0 0 10">
-                <ListBox x:Name="UserRoles">
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock x:Name="SelectedUserName"
+                           Margin="0 0 0 10"
+                           Grid.Row="0"/>
+                <TextBlock Text="Current Roles"
+                           Grid.Row="1"/>
+                
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"  />
+                    </Grid.RowDefinitions>
+                    <ListBox x:Name="UserRoles"
+                             Width="120">
 
-                </ListBox>
-                <Button x:Name="RemoveSelectedRole"
-                        Content="Remove"
-                        Margin="5 0 0 0" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox Name="AvailableRoles" />
+                    </ListBox>
+                    <Button x:Name="RemoveSelectedRole"
+                            Content="Remove"
+                            Margin="5 0 0 0" 
+                            Grid.Column="1"
+                            VerticalAlignment="Top"/>
+                </Grid>
+                
+
+            </Grid>
+
+            <Grid Margin="0 10 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Name="AvailableRoles"
+                          Width="120">
+                    
+                </ComboBox>
                 <Button x:Name="AddSelectedRole"
                         Content="Add Role"
-                        Margin="5 0 0 0" />
+                        Margin="5 0 0 0"
+                        Padding="5"
+                        Grid.Column="1"/>
+            </Grid>
+            <StackPanel Orientation="Horizontal">
+                
             </StackPanel>
         </StackPanel>
     </Grid>
