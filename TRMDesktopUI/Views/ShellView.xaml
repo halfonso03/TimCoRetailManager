@@ -12,14 +12,19 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File"
-                      FontSize="18">
+                      FontSize="14">
                 <MenuItem x:Name="ExitApplication" Header="E_xit"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Account"
-                      FontSize="18"
+                      FontSize="14"                      
                       Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <MenuItem x:Name="Logout"
                           Header="_Logout" />
+            </MenuItem>
+            <MenuItem Header="_Users"
+                      FontSize="14">
+                <MenuItem x:Name="UserManagement"
+                          Header="User_Management" />
             </MenuItem>
         </Menu>
         <Grid>
