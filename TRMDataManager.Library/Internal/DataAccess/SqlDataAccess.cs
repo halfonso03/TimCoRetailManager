@@ -91,6 +91,9 @@ namespace TRMDataManager.Library.Internal.DataAccess
         public void Dispose()
         {
             CommitTransaction();
+
+            _transaction = null;
+            _connection = null;
         }
     }
 }
