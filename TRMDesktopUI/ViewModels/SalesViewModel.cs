@@ -24,58 +24,6 @@ namespace TRMDesktopUI.ViewModels
         private readonly StatusInfoViewModel _status;
         private readonly IWindowManager _window;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper,
-                                ISaleEndpoint saleEndpoint, IMapper mapper, StatusInfoViewModel status,
-                                IWindowManager window)
-        {
-            _productEndpoint = productEndpoint;
-            _configHelper = configHelper;
-            _saleEndpoint = saleEndpoint;
-            _mapper = mapper;
-            _status = status;
-            _window = window;
-        }
-
-        protected override async void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-
-
-            try
-            {
-                await LoadProducts();
-            }
-            catch (Exception ex)
-            {
-                dynamic settings = new ExpandoObject();
-                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                settings.Resizable = ResizeMode.NoResize;
-                settings.Title = "System Error";
-                if (ex.Message == "Unauthorized")
-                {
-                    _status.UpdateMessage("Unauthorized Access", "You shall not passed!");
-                    await _window.ShowDialogAsync(_status, null, settings);
-                }
-                else
-                {
-                    _status.UpdateMessage("Fatal Exception", ex.Message);
-                    await _window.ShowDialogAsync(_status, null, settings);
-
-                }
-
-                
-
-            }
-        }
-
-        private async Task LoadProducts()
-        {
-            var productLists = await _productEndpoint.GetAll();
-            var products = _mapper.Map<List<ProductDisplayModel>>(productLists);
-            Products = new ObservableCollection<ProductDisplayModel>(products);
-        }
-
-
         private ObservableCollection<ProductDisplayModel> _products;
 
         public ObservableCollection<ProductDisplayModel> Products
@@ -138,6 +86,52 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper,
+                                ISaleEndpoint saleEndpoint, IMapper mapper, StatusInfoViewModel status,
+                                IWindowManager window)
+        {
+            _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
+            _saleEndpoint = saleEndpoint;
+            _mapper = mapper;
+            _status = status;
+            _window = window;
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+
+
+            try
+            {
+                await LoadProducts();
+            }
+            catch (Exception ex)
+            {
+                dynamic settings = new ExpandoObject();
+                settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                settings.Resizable = ResizeMode.NoResize;
+                settings.Title = "System Error";
+                if (ex.Message == "Unauthorized")
+                {
+                    _status.UpdateMessage("Unauthorized Access", "You shall not passed!");
+                    await _window.ShowDialogAsync(_status, null, settings);
+                }
+                else
+                {
+                    _status.UpdateMessage("Fatal Exception", ex.Message);
+                    await _window.ShowDialogAsync(_status, null, settings);
+
+                }
+
+                
+
+            }
+        }
+                
+
         public string SubTotal
         {
             get
@@ -145,6 +139,14 @@ namespace TRMDesktopUI.ViewModels
                 return CalculateSubTotal().ToString("C");
             }
         }
+
+        private async Task LoadProducts()
+        {
+            var productLists = await _productEndpoint.GetAll();
+            var products = _mapper.Map<List<ProductDisplayModel>>(productLists);
+            Products = new ObservableCollection<ProductDisplayModel>(products);
+        }
+
 
         private decimal CalculateTax()
         {
@@ -309,5 +311,15 @@ namespace TRMDesktopUI.ViewModels
             await LoadProducts();
         }
 
+        internal async Task ClearCart()
+        {
+            await ResetViewModel();
+        }
+
+        private Guid Id = Guid.NewGuid();
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
     }
 }
