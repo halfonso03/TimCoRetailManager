@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using TRMDesktopUI.EventModels;
-using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 
@@ -91,9 +90,7 @@ namespace TRMDesktopUI.ViewModels
 			{
 				ErrorMessage = string.Empty;
 
-				var apiHelper = new ApiHelper();
-
-				AuthenticatedUser user = await apiHelper.Authenticate(UserName, Password);
+				AuthenticatedUser user = await _apiHelper.Authenticate(UserName, Password);
 
 				await _apiHelper.GetLoginUserInfo(user.Access_Token);
 
