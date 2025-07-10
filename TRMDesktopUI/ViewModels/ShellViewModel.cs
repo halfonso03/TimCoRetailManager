@@ -68,7 +68,6 @@ namespace TRMDesktopUI.ViewModels
             await ActivateItemAsync(IoC.Get<LoginViewModel>());
             IsLoggedIn = false;
             NotifyOfPropertyChange(() => IsLoggedIn);
-            _loginViewModel.OnLogin -= _loginViewModel_OnLogin;
             
         }
     }

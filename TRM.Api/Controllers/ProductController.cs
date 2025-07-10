@@ -14,12 +14,12 @@ namespace TRM.Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly ProductData _productData;
+        private readonly IProductData _productData;
 
-        public ProductController(IConfiguration config)
+        public ProductController(IConfiguration config, IProductData productData)
         {
             _config = config;
-            _productData = new ProductData(config);
+            _productData = productData;
         }
 
         

@@ -13,7 +13,8 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using TRMApi.Data;
-
+using TRMDataManager.Library.DataAccess;
+using TRMDataManager.Library.Internal.DataAccess;
 
 namespace TRMApi
 {
@@ -53,6 +54,12 @@ namespace TRMApi
             services.AddControllersWithViews();
 
 
+            services.AddTransient<IInventoryData, InventoryData>();
+            services.AddTransient<ISaleData, SaleData>();
+            services.AddTransient<IUserData, UserData>();
+            services.AddTransient<IProductData, ProductData>();
+            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "JwtBearer";
@@ -70,7 +77,9 @@ namespace TRMApi
                         ClockSkew = TimeSpan.FromMinutes(5)
                     };
                 });
-           
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,7 +103,6 @@ namespace TRMApi
 
             app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.UseSwagger();
             app.UseSwaggerUI(x =>

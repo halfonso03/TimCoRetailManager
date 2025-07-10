@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
 
         private readonly IConfiguration _config;
@@ -27,7 +27,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
         }
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
-        {   
+        {
             string connectionString = GetConnectionString(connectionStringName);
 
             using (IDbConnection conn = new SqlConnection(connectionString))
@@ -59,7 +59,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
         private IDbConnection _connection;
         private IDbTransaction _transaction;
-        
+
 
         public void StartTransaction(string connectionStringName)
         {
@@ -86,7 +86,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
 
         public void CommitTransaction()
         {
-            if (_transaction.Connection is null) return;
+            if (_transaction?.Connection is null) return;
 
             _transaction?.Commit();
             _connection?.Close();

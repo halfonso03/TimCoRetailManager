@@ -8,20 +8,23 @@ using TRMDataManager.Library.Models;
 
 namespace TRMDataManager.Library.DataAccess
 {
-    public class SaleData
+    public class SaleData : ISaleData, IDisposable
     {
         private readonly IConfiguration _config;
+        private readonly IProductData _productData;
+        private readonly ISqlDataAccess _sqlDataAccess;
 
-        public SaleData(IConfiguration config)
+        public SaleData(IConfiguration config, IProductData productData, ISqlDataAccess sqlDataAccess)
         {
             _config = config;
+            _productData = productData;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             // TODO:: Make this SOLID/DRY/Better
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
-            ProductData products = new ProductData(_config);
             var taxRate = ConfigHelper.GetTaxRate(_config) / 100;
 
             foreach (var item in saleInfo.SaleDetails)
@@ -33,7 +36,7 @@ namespace TRMDataManager.Library.DataAccess
                 };
 
                 // Get information about this product
-                var productInfo = products.GetProductById(detail.ProductId);
+                var productInfo = _productData.GetProductById(detail.ProductId);
 
                 if (productInfo == null)
                 {
@@ -61,45 +64,43 @@ namespace TRMDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess sql = new SqlDataAccess(_config))
+            try
             {
-                try
+                _sqlDataAccess.StartTransaction("TRMData");
+                //Save the model
+                _sqlDataAccess.SaveDataInTransaction<SaleDBModel>("dbo.spSale_Insert", sale);
+
+                // Get the Id from the sale model
+                sale.Id = _sqlDataAccess.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", new { CashierId = sale.CashierId, SaleDate = sale.SaleDate }).FirstOrDefault();
+
+                // Finish filling in the sale details models
+                foreach (var item in details)
                 {
-                    sql.StartTransaction("TRMData");
-                    //Save the model
-                    sql.SaveDataInTransaction<SaleDBModel>("dbo.spSale_Insert", sale);
+                    item.SaleId = sale.Id;
 
-                    // Get the Id from the sale model
-                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("dbo.spSale_Lookup", new { CashierId = sale.CashierId, SaleDate = sale.SaleDate }).FirstOrDefault();
-
-                    // Finish filling in the sale details models
-                    foreach (var item in details)
-                    {
-                        item.SaleId = sale.Id;
-
-                        // Save the sale details models
-                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
-                    }
-                    //Can explicitly call but it will implicitly close after using statment finished.
-                    sql.CommitTransaction();
+                    // Save the sale details models
+                    _sqlDataAccess.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
                 }
-                catch
-                {
-                    sql.RollbackTransaction();
-                    throw;
-                }
+                //Can explicitly call but it will implicitly close after using statment finished.
+                _sqlDataAccess.CommitTransaction();
             }
-
-
+            catch
+            {
+                _sqlDataAccess.RollbackTransaction();
+                throw;
+            }
         }
 
 
         public List<SaleReportModel> GetSaleReport()
         {
-            SqlDataAccess sql = new SqlDataAccess(_config);
-
-            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
+            var output = _sqlDataAccess.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
             return output;
+        }
+
+        public void Dispose()
+        {
+            _sqlDataAccess?.Dispose();            
         }
     }
 }

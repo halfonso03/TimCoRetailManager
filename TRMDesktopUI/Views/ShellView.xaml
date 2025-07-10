@@ -30,5 +30,6 @@
         <Grid>
             <ContentControl x:Name="ActiveItem" Margin="20 5 20 20"></ContentControl>
         </Grid>
+        <TextBlock Text="{Binding IsLoggedIn}"> </TextBlock>
     </DockPanel>
 </Window>

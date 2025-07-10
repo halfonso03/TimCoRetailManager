@@ -63,7 +63,7 @@ namespace TRMDesktopUI
                .Where(type => type.IsClass)
                .Where(type => type.Name.EndsWith("ViewModel"))
                .ToList()
-               .ForEach(viewModelType => _container.RegisterPerRequest(
+               .ForEach(viewModelType => _container.RegisterSingleton(
                    viewModelType, viewModelType.ToString(), viewModelType));
 
         }
