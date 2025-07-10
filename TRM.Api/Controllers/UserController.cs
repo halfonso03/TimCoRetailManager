@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TRMApi.Data;
 using TRMApi.Models;
+using TRMDataManager.Library.DataAccess;
 using TRMDataManager.Library.Internal.DataAccess;
 using TRMDataManager.Library.Internal.Models;
 
@@ -23,20 +26,22 @@ namespace TRMApi.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserData _userData;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(ApplicationDbContext context, 
-            UserManager<IdentityUser> userManager,
-            IUserData userData)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager
+            , IUserData userData, ILogger<UserController> logger)
         {
             _context = context;
             _userManager = userManager;
             _userData = userData;
+            _logger = logger;
         }
 
         [HttpGet]
-        public ActionResult<UserModel> GetById()
+        public UserModel GetById()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); //old way - RequestContext.Principal.Identity.GetUserId();
+
             return _userData.GetUserById(userId).First();
 
         }
@@ -44,11 +49,15 @@ namespace TRMApi.Controllers
         [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("Admin/GetAllUsers")]
-        public async Task<List<ApplicationUserModel>> GetAllUsers()
+        public List<ApplicationUserModel> GetAllUsers()
         {
-            var output = new List<ApplicationUserModel>();
+            List<ApplicationUserModel> output = new List<ApplicationUserModel>();
+
             var users = _context.Users.ToList();
-            var roles = _context.Roles.ToList();
+
+            var userRoles = from ur in _context.UserRoles
+                            join r in _context.Roles on ur.RoleId equals r.Id
+                            select new { ur.UserId, ur.RoleId, r.Name };
 
             foreach (var user in users)
             {
@@ -58,23 +67,18 @@ namespace TRMApi.Controllers
                     Email = user.Email
                 };
 
-                var userRoleNames = await _userManager.GetRolesAsync(user);
+                u.Roles = userRoles.Where(x => x.UserId == u.Id).ToDictionary(key => key.RoleId, val => val.Name);
 
-                foreach (var roleName in userRoleNames)
-                {
-                    var roleFromDb = _context.Roles.First(x => x.Name == roleName);
-
-                    u.Roles.Add(roleFromDb.Id, roles.First(x => x.Id == roleFromDb.Id).Name);
-                }
+                //foreach (var r in user.Roles)
+                //{
+                //    u.Roles.Add(r.RoleId, roles.Where(x => x.Id == r.RoleId).First().Name);
+                //}
 
                 output.Add(u);
             }
 
-
-
             return output;
         }
-
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
@@ -89,8 +93,13 @@ namespace TRMApi.Controllers
         [HttpPost]
         [Route("Admin/AddRole")]
         public async Task AddARole(UserRolePairModel pairing)
-        {            
-            var user = _context.Users.First(x => x.Id == pairing.UserId);
+        {
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            _logger.LogInformation("Admin {Admin} added user {User} to role {Role}",
+                loggedInUserId, user.Id, pairing.RoleName);
+
             await _userManager.AddToRoleAsync(user, pairing.RoleName);
         }
 
@@ -99,7 +108,11 @@ namespace TRMApi.Controllers
         [Route("Admin/RemoveRole")]
         public async Task RemoveARole(UserRolePairModel pairing)
         {
-            var user = _context.Users.First(x => x.Id == pairing.UserId);
+            var user = await _userManager.FindByIdAsync(pairing.UserId);
+
+            string loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _logger.LogInformation("Admin {Admin} removed user {User} from role {Role}",
+                loggedInUserId, user.Id, pairing.RoleName);
 
             await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
         }

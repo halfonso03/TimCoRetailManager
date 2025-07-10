@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,17 +14,18 @@ namespace TRMDataManager.Library.Internal.DataAccess
 {
     public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
-
         private readonly IConfiguration _config;
+        private readonly ILogger<SqlDataAccess> _logger;
 
-        public SqlDataAccess(IConfiguration config)
+        public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
             _config = config;
+            _logger = logger;
         }
-
         public string GetConnectionString(string connectionString)
         {
-            return _config.GetConnectionString("TRMData");
+            return _config.GetConnectionString(connectionString);
+            // old way - return ConfigurationManager.ConnectionStrings[connectionString].ConnectionString;
         }
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
@@ -60,7 +62,6 @@ namespace TRMDataManager.Library.Internal.DataAccess
         private IDbConnection _connection;
         private IDbTransaction _transaction;
 
-
         public void StartTransaction(string connectionStringName)
         {
             string connectionString = GetConnectionString(connectionStringName);
@@ -68,8 +69,9 @@ namespace TRMDataManager.Library.Internal.DataAccess
             _connection.Open();
 
             _transaction = _connection.BeginTransaction();
-        }
 
+            isClosed = false;
+        }
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
             List<T> rows = _connection.Query<T>(storedProcedure, parameters,
@@ -84,23 +86,35 @@ namespace TRMDataManager.Library.Internal.DataAccess
                 commandType: CommandType.StoredProcedure, transaction: _transaction);
         }
 
+        private bool isClosed = false;
+
         public void CommitTransaction()
         {
-            if (_transaction?.Connection is null) return;
-
             _transaction?.Commit();
             _connection?.Close();
+            isClosed = true;
         }
 
         public void RollbackTransaction()
         {
             _transaction?.Rollback();
             _connection?.Close();
+            isClosed = true;
         }
 
         public void Dispose()
         {
-            CommitTransaction();
+            if (isClosed == false)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Commit transaction failed in the dispose method.");
+                }
+            }
 
             _transaction = null;
             _connection = null;

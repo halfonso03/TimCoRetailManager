@@ -28,8 +28,19 @@
             </MenuItem>
         </Menu>
         <Grid>
-            <ContentControl x:Name="ActiveItem" Margin="20 5 20 20"></ContentControl>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"  />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*"
+                                   />
+            </Grid.ColumnDefinitions>
+            <ContentControl x:Name="ActiveItem"
+                            HorizontalContentAlignment="Stretch"
+                            HorizontalAlignment="Center"
+                            Grid.Column="1"></ContentControl>
         </Grid>
-        <TextBlock Text="{Binding IsLoggedIn}"> </TextBlock>
+            
+        
+        
     </DockPanel>
 </Window>
