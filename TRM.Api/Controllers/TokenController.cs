@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -21,12 +22,18 @@ namespace TRMApi.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
 
-        public TokenController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public TokenController(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _configuration = configuration;
         }
 
 
@@ -89,7 +96,7 @@ namespace TRMApi.Controllers
             var token = new JwtSecurityToken(
                                     new JwtHeader(
                                         new SigningCredentials(
-                                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysecretkeyissecretsodonottell12")), SecurityAlgorithms.HmacSha256)
+                                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Secrets:SecurityKey"))), SecurityAlgorithms.HmacSha256)
                                         ),
                                         new JwtPayload(claims));
 
