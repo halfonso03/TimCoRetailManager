@@ -11,7 +11,6 @@ namespace TRMApi.Data
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
 
-        //public DbSet<ApplicationRole> ApplicationRoles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
                 : base(options)

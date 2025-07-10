@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace TRMDataManager.Library
 {
     public class ConfigHelper
     {
-        public static decimal GetTaxRate()
+        public static decimal GetTaxRate(IConfiguration configuration)
         {
-            string rateText = ConfigurationManager.AppSettings["taxRate"];
+            string rateText = configuration.GetSection("TaxRate").Value;
 
             bool IsValidTaxRate = Decimal.TryParse(rateText, out decimal output);
 

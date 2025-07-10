@@ -22,7 +22,7 @@ namespace TRMDataManager.Library.DataAccess
             // TODO:: Make this SOLID/DRY/Better
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
             ProductData products = new ProductData(_config);
-            var taxRate = ConfigHelper.GetTaxRate() / 100;
+            var taxRate = ConfigHelper.GetTaxRate(_config) / 100;
 
             foreach (var item in saleInfo.SaleDetails)
             {
